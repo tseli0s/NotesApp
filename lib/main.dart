@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:NotesApp/header.dart';
 import 'package:NotesApp/settings.dart';
 import 'package:NotesApp/gradient_button.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
