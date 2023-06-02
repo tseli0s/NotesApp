@@ -11,7 +11,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   runApp(const MaterialApp(home: NotesApp()));
 }
 
@@ -152,7 +151,7 @@ class NotesAppState extends State<NotesApp> {
                 child: Column(
                   children: [
                     const SizedBox(
-                      height: 32,
+                      height: 128,
                     ),
                     Header('Welcome!', Colors.black),
                     const Text('Choose a note below, or create one.'),
