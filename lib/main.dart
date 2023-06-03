@@ -169,9 +169,6 @@ class NotesAppState extends State<NotesApp> {
           ),
         );
         break;
-      case 1:
-        // Do something for the second item
-        break;
     }
   }
 
