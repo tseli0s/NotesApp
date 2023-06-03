@@ -20,12 +20,68 @@ class NotesApp extends StatefulWidget {
   NotesAppState createState() => NotesAppState();
 }
 
+void removeNoteFile(BuildContext context, String title) async {
+  final appDirectory = await getApplicationDocumentsDirectory();
+  final noteFilePath = '${appDirectory.path}/$title.nte';
+  final noteFile = File(noteFilePath);
+
+  if (await noteFile.exists()) {
+    await noteFile.delete();
+    if (context.mounted) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text("Note deleted"),
+            content: Text("The note '$title' has been deleted succesfully."),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  } else {
+    if (context.mounted) {
+      showCupertinoModalPopup(
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: Text("Couldn't remove note '$title'!"),
+              content: const Text(
+                  "There was an error while attempting to remove the file containing the note. Try again later."),
+              actions: [
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          });
+    }
+  }
+}
+
 Widget createNoteCell(BuildContext context, String title, String body) {
   return CupertinoContextMenu(
     actions: [
       CupertinoContextMenuAction(
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TextEditor(title: title, body: body),
+            ),
+          );
         },
         isDefaultAction: true,
         isDestructiveAction: false,
@@ -35,6 +91,7 @@ Widget createNoteCell(BuildContext context, String title, String body) {
       CupertinoContextMenuAction(
         onPressed: () {
           Navigator.pop(context);
+          removeNoteFile(context, title);
         },
         isDestructiveAction: true,
         trailingIcon: CupertinoIcons.delete,
@@ -200,8 +257,8 @@ class NotesAppState extends State<NotesApp> {
               icon: Icon(Icons.settings_applications),
             ),
             BottomNavigationBarItem(
-              label: 'Version 0.1.0-rc1',
-              icon: Icon(Icons.sort_by_alpha_outlined),
+              label: 'Refresh Notes',
+              icon: Icon(Icons.refresh_rounded),
             )
           ],
         ),
