@@ -3,6 +3,42 @@ import 'package:flutter/material.dart';
 import 'package:NotesApp/gradient_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+void showCupertinoAboutDialog(BuildContext context) {
+  showCupertinoDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Theme(
+        data: ThemeData.light(useMaterial3: true),
+        child: CupertinoAlertDialog(
+          title: const Text('About NotesApp'),
+          content: Column(
+            children: [
+              const Text('A minimal and open source note taking application.'),
+              SizedBox(height: 24),
+              CupertinoButton(
+                child: const Text('Source Code'),
+                onPressed: () {
+                  const githubUrl = 'https://github.com/tseli0s/NotesApp';
+                  launch(githubUrl);
+                },
+              ),
+              const Text('Version: 0.1.0'),
+            ],
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -35,38 +71,7 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('About'),
               subtitle: const Text('View information about the app'),
               onTap: () {
-                showCupertinoDialog(
-                  context: context,
-                  builder: (context) {
-                    return CupertinoPageScaffold(
-                      navigationBar: const CupertinoNavigationBar(
-                        middle: Text('About NotesApp'),
-                      ),
-                      child: Column(
-                        children: [
-                          CupertinoButton(
-                            child: const Text('GitHub'),
-                            onPressed: () async {
-                              Uri uri = Uri(
-                                  scheme: 'https',
-                                  host: 'github.com',
-                                  path: 'tseli0s/NotesApp');
-                              canLaunchUrl(uri).then((value) {
-                                if (value) {
-                                  launchUrl(uri);
-                                }
-                              });
-                            },
-                          ),
-                          MaterialButton(
-                            child: const Text('Close'),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
+                showCupertinoAboutDialog(context);
               },
             ),
           ],
