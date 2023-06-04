@@ -1,0 +1,17 @@
+<p>
+    <b>NotesApp</b> is a minimal, free note taking application for Android, iOS and GNU/Linux
+    emphasizing on simplicity. It tries to do one job and nothing else: Give you the basic functionality
+    to write down some notes.
+</p>
+<p>
+    <b>NotesApp</b> is powered by <a href="https://flutter.dev">Flutter and Dart</a>.
+</p>
+
+<h2>Features:</h2>
+<ul>
+<li>Very fast note loading from disk.</li>
+<li>Intuitive, simple interface written using Flutter.</li>
+<li>Works on all major platforms (But mainly targeted for Android).</li>
+<li>Supports all the basic functionality you would need from a note app.</li>
+<li>100% free and open source.</li>
+</ul>
