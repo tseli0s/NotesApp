@@ -14,7 +14,7 @@ void showCupertinoAboutDialog(BuildContext context) {
           content: Column(
             children: [
               const Text('A minimal and open source note taking application.'),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               CupertinoButton(
                 child: const Text('Source Code'),
                 onPressed: () {
@@ -27,7 +27,7 @@ void showCupertinoAboutDialog(BuildContext context) {
           ),
           actions: [
             CupertinoDialogAction(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.pop(context); // Close the dialog
               },
