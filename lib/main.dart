@@ -5,9 +5,30 @@ import 'package:flutter/material.dart';
 import 'package:NotesApp/header.dart';
 import 'package:NotesApp/settings.dart';
 import 'package:NotesApp/gradient_button.dart';
+import 'package:flutter/scheduler.dart';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+
+final ThemeData darkTheme = ThemeData(
+  colorScheme: const ColorScheme(
+    brightness: Brightness.dark,
+    primary: Color(0xff1971ff),
+    onPrimary: Color(0xFFFFFFFF),
+    secondary: Color(0xFF00A6FF),
+    onSecondary: Color(0xFFFFFFFF),
+    error: Color(0xffff4f55),
+    onError: Color(0xffff0009),
+    background: Colors.black87,
+    onBackground: Colors.black12,
+    surface: Color(0xFF488EFF),
+    onSurface: Color(0xffffffff),
+  ),
+  scaffoldBackgroundColor: const Color(0xFF131313),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Color(0xFF131313),
+  ),
+);
 
 void main() async {
   runApp(const MaterialApp(home: NotesApp()));
@@ -20,141 +41,8 @@ class NotesApp extends StatefulWidget {
   NotesAppState createState() => NotesAppState();
 }
 
-void removeNoteFile(BuildContext context, String title) async {
-  final appDirectory = await getApplicationDocumentsDirectory();
-  final noteFilePath = '${appDirectory.path}/$title.nte';
-  final noteFile = File(noteFilePath);
-
-  if (await noteFile.exists()) {
-    await noteFile.delete();
-    if (context.mounted) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text("Note deleted"),
-            content: Text("The note '$title' has been deleted succesfully."),
-            actions: [
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Close'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  } else {
-    if (context.mounted) {
-      showCupertinoModalPopup(
-          context: context,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: Text("Couldn't remove note '$title'!"),
-              content: const Text(
-                  "There was an error while attempting to remove the file containing the note. Try again later."),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Close'),
-                ),
-              ],
-            );
-          });
-    }
-  }
-}
-
-Widget createNoteCell(BuildContext context, String title, String body) {
-  return CupertinoContextMenu(
-    actions: [
-      CupertinoContextMenuAction(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TextEditor(title: title, body: body),
-            ),
-          );
-        },
-        isDefaultAction: true,
-        isDestructiveAction: false,
-        trailingIcon: CupertinoIcons.folder_open,
-        child: const Text('Edit Note'),
-      ),
-      CupertinoContextMenuAction(
-        onPressed: () {
-          Navigator.pop(context);
-          removeNoteFile(context, title);
-        },
-        isDestructiveAction: true,
-        trailingIcon: CupertinoIcons.delete,
-        child: const Text('Delete Note'),
-      ),
-    ],
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 32.0, maxHeight: 32.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => TextEditor(
-                title: title,
-                body: body,
-              ),
-            ),
-          );
-        },
-        child: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.lightBlue[700]!, Colors.blue[800]!],
-            ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 21,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  body,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
 class NotesAppState extends State<NotesApp> {
   int _currentIndex = 0;
-  bool useDarkTheme = false;
 
   void _onTabTapped(int index) {
     setState(() {
@@ -179,23 +67,9 @@ class NotesAppState extends State<NotesApp> {
 
     return MaterialApp(
       title: 'NotesApp',
-      theme: useDarkTheme ? ThemeData.dark() : ThemeData.light(),
+      theme: ThemeData.light(),
+      darkTheme: darkTheme,
       home: Scaffold(
-        floatingActionButton: GradientButton(
-          size: 48,
-          icon: const Icon(Icons.dark_mode_rounded),
-          onPressed: () {
-            setState(() {
-              useDarkTheme = !useDarkTheme;
-            });
-          },
-          gradientColors: useDarkTheme
-              ? const [Colors.black, Colors.black54]
-              : const [Colors.white, Colors.white70],
-          iconGradientColors: useDarkTheme
-              ? [Colors.blue, Colors.blue[900]!]
-              : [Colors.cyan[100]!, Colors.cyanAccent],
-        ),
         body: FutureBuilder<List<Widget>>(
           future: futureNotes,
           builder: (context, snapshot) {
@@ -299,4 +173,137 @@ Future<List<Widget>> loadNotes(BuildContext context) async {
   }
 
   return notes;
+}
+
+void removeNoteFile(BuildContext context, String title) async {
+  final appDirectory = await getApplicationDocumentsDirectory();
+  final noteFilePath = '${appDirectory.path}/$title.nte';
+  final noteFile = File(noteFilePath);
+
+  if (await noteFile.exists()) {
+    await noteFile.delete();
+    if (context.mounted) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text("Note deleted"),
+            content: Text("The note '$title' has been deleted succesfully."),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  } else {
+    if (context.mounted) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: Text("Couldn't remove note '$title'!"),
+            content: const Text(
+                "There was an error while attempting to remove the file containing the note. Try again later."),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+}
+
+Widget createNoteCell(BuildContext context, String title, String body) {
+  return CupertinoContextMenu(
+    actions: [
+      CupertinoContextMenuAction(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TextEditor(title: title, body: body),
+            ),
+          );
+        },
+        isDefaultAction: true,
+        isDestructiveAction: false,
+        trailingIcon: CupertinoIcons.folder_open,
+        child: const Text('Edit Note'),
+      ),
+      CupertinoContextMenuAction(
+        onPressed: () {
+          Navigator.pop(context);
+          removeNoteFile(context, title);
+        },
+        isDestructiveAction: true,
+        trailingIcon: CupertinoIcons.delete,
+        child: const Text('Delete Note'),
+      ),
+    ],
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 32.0, maxHeight: 32.0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (context) => TextEditor(
+                title: title,
+                body: body,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.lightBlue[700]!, Colors.blue[800]!],
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
