@@ -18,8 +18,12 @@ void showCupertinoAboutDialog(BuildContext context) {
               CupertinoButton(
                 child: const Text('Source Code'),
                 onPressed: () {
-                  const githubUrl = 'https://github.com/tseli0s/NotesApp';
-                  launch(githubUrl);
+                  final githubUrl = Uri(
+                    scheme: 'https',
+                    host: 'github.com',
+                    path: 'tselios/NotesApp',
+                  );
+                  launchUrl(githubUrl);
                 },
               ),
               const Text('Version: 0.1.0'),
@@ -29,7 +33,7 @@ void showCupertinoAboutDialog(BuildContext context) {
             CupertinoDialogAction(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context);
               },
             ),
           ],
