@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:NotesApp/header.dart';
 import 'package:NotesApp/settings.dart';
-import 'package:NotesApp/gradient_button.dart';
-import 'package:flutter/scheduler.dart';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -67,7 +65,7 @@ class NotesAppState extends State<NotesApp> {
 
     return MaterialApp(
       title: 'NotesApp',
-      theme: ThemeData.light(),
+      theme: ThemeData.light(useMaterial3: true),
       darkTheme: darkTheme,
       home: Scaffold(
         body: FutureBuilder<List<Widget>>(
