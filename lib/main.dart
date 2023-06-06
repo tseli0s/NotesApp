@@ -154,6 +154,7 @@ Widget createNoteCell(BuildContext context, String title, String body) {
 
 class NotesAppState extends State<NotesApp> {
   int _currentIndex = 0;
+  bool useDarkTheme = false;
 
   void _onTabTapped(int index) {
     setState(() {
@@ -178,13 +179,22 @@ class NotesAppState extends State<NotesApp> {
 
     return MaterialApp(
       title: 'NotesApp',
+      theme: useDarkTheme ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
         floatingActionButton: GradientButton(
           size: 48,
-          icon: const Icon(Icons.exit_to_app),
-          onPressed: () => exit(0),
-          gradientColors: const [Colors.white, Colors.white70],
-          iconGradientColors: [Colors.blue, Colors.blue[900]!],
+          icon: const Icon(Icons.dark_mode_rounded),
+          onPressed: () {
+            setState(() {
+              useDarkTheme = !useDarkTheme;
+            });
+          },
+          gradientColors: useDarkTheme
+              ? const [Colors.black, Colors.black54]
+              : const [Colors.white, Colors.white70],
+          iconGradientColors: useDarkTheme
+              ? [Colors.blue, Colors.blue[900]!]
+              : [Colors.cyan[100]!, Colors.cyanAccent],
         ),
         body: FutureBuilder<List<Widget>>(
           future: futureNotes,
